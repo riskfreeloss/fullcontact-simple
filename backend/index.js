@@ -23,7 +23,8 @@ app.use(express.static(__dirname + '/public'))
 var fullcontact = new FullContact(app.get('fc_api_key'));
 
 app.get('/', function(request, response) {
-	var emailParam = request.param("email") || '';
+	var emailParam = request.param("email") || 'profile123';
+
 	fullcontact.person.email(emailParam, function (err, data) {
 		var result = 'Attempted to retrieve data for <pre>'+emailParam+'</pre><br>';
 		if(err)
@@ -31,6 +32,7 @@ app.get('/', function(request, response) {
 		if(data)
 			result = result+JSON.stringify(data)+'</br>';
 		result = result + '<br><pre>'+JSON.stringify(process.env)+'</pre></br>';
+
 		response.send(result);
 	});
 });
