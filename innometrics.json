@@ -1,0 +1,24 @@
+{    
+    "version_name": "FullContact Simple",
+    "version_description": "",
+    "pages": [{
+        "name": "Setting App",
+        "type": "internal",
+        "content": "frontend/settings.html"
+    }],
+    "permissions": ["stream", "profile.update"],
+    "runtime": {
+        "language": "node",
+        "version": "0.10"
+    },
+    "minimum_requirements": {
+        "memory": 100
+    },
+    "env_vars": {
+        "FULLCONTACT_API_KEY": "79e990218daa61c6",
+        "INNO_COMPANY_ID":"263",
+        "INNO_BUCKET":"test-bucket",
+        "INNO_APP_KEY":"",
+        "INNO_API_URL":"http://prerelease.innomdc.com/v1"
+    }
+}
