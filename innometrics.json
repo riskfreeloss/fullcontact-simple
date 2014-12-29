@@ -16,8 +16,8 @@
     },
     "env_vars": {
         "FULLCONTACT_API_KEY": "79e990218daa61c6",
-        "INNO_COMPANY_ID":"263",
-        "INNO_BUCKET":"test-bucket",
+        "INNO_COMPANY_ID":"9",
+        "INNO_BUCKET":"first-bucket",
         "INNO_APP_KEY":"",
         "INNO_API_URL":"http://prerelease.innomdc.com/v1"
     }
