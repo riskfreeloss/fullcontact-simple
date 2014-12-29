@@ -3,12 +3,12 @@ var express = require('express')
 var app = express();
 var FullContact = require('fullcontact');
 
-var inno = require('./innometrics-backend-app');
+var inno = require('./innometrics');
 inno.setVars({
-    bucketName: process.env.INNO_BUCKET || 'steel',
-    appKey: process.env.INNO_APP_KEY || 'K69XeW05b4sRGJXG',
-    appName: process.env.INNO_APP_NAME || 'aluminium',
-    groupId: process.env.INNO_COMPANY_ID || 8,
+    bucketName: process.env.INNO_BUCKET || 'test-bucket',
+    appKey: process.env.INNO_APP_KEY || 'not-web',
+    appName: process.env.INNO_APP_NAME || 'full-contact-simple',
+    groupId: process.env.INNO_COMPANY_ID || 263,
     apiUrl: process.env.INNO_API_URL || 'http://prerelease.innomdc.com/v1',
     auth: {
         user: '4.superuser',
