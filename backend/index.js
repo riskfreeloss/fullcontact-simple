@@ -1,42 +1,53 @@
 // fullcontact-simple
-var express = require('express')
-var app = express();
-var FullContact = require('fullcontact');
+var express = require('express'),
+	FullContact = require('fullcontact'),
+    inno = require('./innometrics-helper'),
+    app = express();
 
-/*
-var inno = require('./innometrics');
+app.set('port', (process.env.PORT || 5000));
+
 inno.setVars({
-    bucketName: process.env.INNO_BUCKET || 'test-bucket',
+    bucketName: process.env.INNO_BUCKET || 'first-bucket',
     appKey: process.env.INNO_APP_KEY || 'not-web',
     appName: process.env.INNO_APP_NAME || 'full-contact-simple',
-    groupId: process.env.INNO_COMPANY_ID || 263,
+    groupId: process.env.INNO_COMPANY_ID || 9,
     apiUrl: process.env.INNO_API_URL || 'http://prerelease.innomdc.com/v1',
     auth: {
         user: '4.superuser',
         pass: 'test'
     }
 });
-*/
 
-app.set('port', (process.env.PORT || 5000))
 app.set('fc_api_key', (process.env.FULLCONTACT_API_KEY))
 app.use(express.static(__dirname + '/public'))
 
 var fullcontact = new FullContact(app.get('fc_api_key'));
 
 app.get('/', function(request, response) {
-	var emailParam = request.param("email") || 'profile123';
 
-	fullcontact.person.email(emailParam, function (err, data) {
-		var result = 'Attempted to retrieve data for <pre>'+emailParam+'</pre><br>';
-		if(err)
-			result = result+'ERROR:<br>'+err+'</br>';
-		if(data)
-			result = result+JSON.stringify(data)+'</br>';
-		result = result + '<br><pre>'+JSON.stringify(process.env)+'</pre></br>';
+		inno.getSettings({
+        	vars: inno.getVars()
+	    }, function (err, settings) {
+	        if (err) {
+	            return res.json({
+	                error: err.message
+	            });
+	        }
 
-		response.send(result);
-	});
+			//var emailParam = request.param("email") || settings.email;
+			var emailParam = settings.email;
+
+			fullcontact.person.email(emailParam, function (err, data) {
+				var result = 'Attempted to retrieve data for <pre>'+emailParam+'</pre><br>';
+				if(err)
+					result = result+'ERROR:<br>'+err+'</br>';
+				if(data)
+					result = result+JSON.stringify(data)+'</br>';
+				result = result + '<br><pre>'+JSON.stringify(process.env)+'</pre></br>';
+
+				response.send(result);
+			});
+	    });
 });
 
 app.listen(app.get('port'), function() {
