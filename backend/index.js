@@ -29,7 +29,7 @@ app.get('/', function(request, response) {
         	vars: inno.getVars()
 	    }, function (err, settings) {
 	        if (err) {
-	            return res.json({
+	            return response.json({
 	                error: err.message
 	            });
 	        }
