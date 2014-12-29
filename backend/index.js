@@ -3,6 +3,7 @@ var express = require('express')
 var app = express();
 var FullContact = require('fullcontact');
 
+/*
 var inno = require('./innometrics');
 inno.setVars({
     bucketName: process.env.INNO_BUCKET || 'test-bucket',
@@ -15,6 +16,7 @@ inno.setVars({
         pass: 'test'
     }
 });
+*/
 
 app.set('port', (process.env.PORT || 5000))
 app.set('fc_api_key', (process.env.FULLCONTACT_API_KEY))
