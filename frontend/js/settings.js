@@ -9,22 +9,21 @@ var editor = new JSONEditor(formEl, {
         type: 'object',
         title: 'Alchemy app settings',
         properties: {
-            inputValue: {
-                title: 'Import',
+            fcApiKey: {
+                title: 'FullContact API key',
                 type: 'string',
-                minLength: 0,
-                maxLength: 40
+                minLength: 16,
+                maxLength: 16
             },
-            exportValue: {
-                title: 'Export',
+            email: {
+                title: 'Email',
                 type: 'string',
-                minLength: 0,
-                readonly: true
+                minLength: 5
             }
         }
     },
     //startval: {},
-    required: ['apiKey'],
+    required: ['apiKey', 'email'],
     required_by_default: true,
     theme: 'bootstrap3'
 });
