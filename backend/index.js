@@ -8,7 +8,7 @@ app.set('port', (process.env.PORT || 5000));
 
 inno.setVars({
     bucketName: process.env.INNO_BUCKET || 'first-bucket',
-    appKey: process.env.INNO_APP_KEY || '86icL7mQMU824FTn',
+    appKey: process.env.INNO_APP_KEY || '17A1q5uC8c225hgW',
     appName: process.env.INNO_APP_NAME || 'full-contact-simple',
     groupId: process.env.INNO_COMPANY_ID || 9,
     apiUrl: process.env.INNO_API_URL || 'http://prerelease.innomdc.com/v1',
@@ -24,6 +24,7 @@ inno.setVars({
 
 var fullcontact;
 
+console.log("Setting up FullContact...");
 inno.getSettings({
         	vars: inno.getVars()
 	    }, function (err, settings) {
@@ -68,7 +69,8 @@ app.get('/', function(request, response) {
 					if(data)
 						result = result+JSON.stringify(data)+'</br>';
 					result = result + '<br><pre>'+JSON.stringify(process.env)+'</pre></br>';
-
+					
+					console.log(result);
 					return response.send(result);
 				});
 			});
