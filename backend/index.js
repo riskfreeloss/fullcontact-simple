@@ -28,7 +28,7 @@ inno.getSettings({
         	vars: inno.getVars()
 	    }, function (err, settings) {
 	        if (err) {
-  				console.log("Error:" + err.message);
+  				console.log("Error: " + err.message + " vars: "+JSON.stringify(inno.getVars()));
 	        }
 
 	    	var fcApiKey = settings ? settings.fcApiKey : process.env.FULLCONTACT_API_KEY;
@@ -46,18 +46,19 @@ app.get('/', function(request, response) {
 	}, function (err, settings) {
 		if (err) {
 			return response.json({
-				error: err.message
+				error: err.message,
+				vars: inno.getVars()
 			});
 		}
 
-			//var emailParam = request.param("email") || settings.email;
-			var emailParam = settings.email;
+		//var emailParam = request.param("email") || settings.email;
+		var emailParam = settings.email;
 
-			fullcontact.person.email(emailParam, function (err, data) {
+		fullcontact.person.email(emailParam, function (err, data) {
 
-				inno.updateProfile({
-					vars: inno.getVars(),
-					data: {
+			inno.updateProfile({
+				vars: inno.getVars(),
+				data: {
 						'socialMediaData': data
 					}
 				}, function (err) {
@@ -71,7 +72,7 @@ app.get('/', function(request, response) {
 					return response.send(result);
 				});
 			});
-		});
+	});
 });
 
 app.listen(app.get('port'), function() {
