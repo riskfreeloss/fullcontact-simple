@@ -42,6 +42,8 @@ app.use(express.static(__dirname + '/public'))
 
 app.get('/', function(request, response) {
 
+	console.log("Received http request: "+JSON.stringify(request.params)+" "+JSON.stringify(request.query)+" "+JSON.stringify(request.body));
+
 	inno.getSettings({
 		vars: inno.getVars()
 	}, function (err, settings) {
