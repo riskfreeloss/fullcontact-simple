@@ -18,10 +18,22 @@ inno.setVars({
     }
 });
 
-app.set('fc_api_key', (process.env.FULLCONTACT_API_KEY))
-app.use(express.static(__dirname + '/public'))
+var fullcontact;
 
-var fullcontact = new FullContact(app.get('fc_api_key'));
+inno.getSettings({
+        	vars: inno.getVars()
+	    }, function (err, settings) {
+	        if (err) {
+	            return response.json({
+	                error: err.message
+	            });
+	        }
+
+			fullcontact = new FullContact(settings.fcApiKey);
+		});
+
+
+app.use(express.static(__dirname + '/public'))
 
 app.get('/', function(request, response) {
 
