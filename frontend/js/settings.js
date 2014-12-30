@@ -19,6 +19,12 @@ var editor = new JSONEditor(formEl, {
                 title: 'Email',
                 type: 'string',
                 minLength: 5
+            },
+            IMAppKey: {
+                title: 'Innometrics App Key',
+                type: 'string',
+                minLength: 16,
+                maxLength: 16
             }
         }
     },
