@@ -1,5 +1,6 @@
 // fullcontact-simple
 var express = require('express'),
+	bodyParser = require('body-parser'),
 	FullContact = require('fullcontact'),
     inno = require('./innometrics-helper'),
     app = express();
@@ -39,6 +40,7 @@ inno.getSettings({
 
 
 app.use(express.static(__dirname + '/public'))
+app.use(bodyParser.json())
 
 app.get('/', handleRequests);
 app.post('/', handleRequests);
@@ -49,7 +51,8 @@ app.listen(app.get('port'), function() {
 
 function handleRequests(request, response) {
 
-	console.log("Received http request: "+JSON.stringify(request.method)+" "+JSON.stringify(request.params)+" "+JSON.stringify(request.query)+" "+JSON.stringify(request.body));
+
+	console.log("Received http request, method: "+JSON.stringify(request.method)+" params: "+JSON.stringify(request.params)+" query: "+JSON.stringify(request.query)+" body: "+JSON.stringify(request.body));
 
 	inno.getSettings({
 		vars: inno.getVars()
@@ -62,22 +65,59 @@ function handleRequests(request, response) {
 		}
 
 		var emailParam = request.param("email") || settings.email;
-		//var emailParam = settings.email;
+		if(request.body && request.body.profile)
+		{
+			var sessions = request.body.profile.sessions || [];
+			for(var i = 0; i < sessions.length; i++)
+			{
+				var events = request.body.profile.sessions[i].events || [];
+				for(var j = 0; j < events.length; j++)
+				{
+					var ev = events[j];
+					if(ev.definitionId && ev.definitionId == "fake-login-event" && ev.data && ev.data.email)
+					{
+						emailParam = ev.data.email;
+					}
+				}
+			}
+		}
+		else
+		{
+			console.log("Unrecognized input in body, using profile ID "+inno.getVars().profileId+" and email: "+emailParam);
+		}
 
 		fullcontact.person.email(emailParam, function (err, data) {
 
+			console.log("Attempting to retrieve social media data for "+emailParam);
+
+			var innoVars = inno.getVars();
+			if(request.body && request.body.profile && request.body.profile.id) {
+				console.log("parsed profileId to update: "+request.body.profile.id);
+				innoVars.profileId = request.body.profile.id;
+			}
+			else
+			{
+				console.log("no profile id in body, using "+innoVars.profileId);
+				console.log(request.body);
+			}
+
 			inno.updateProfile({
-				vars: inno.getVars(),
+				vars: innoVars,
 				data: {
 						'socialMediaData': data
 					}
 				}, function (err) {
 					var result = 'Attempted to retrieve data for <pre>'+emailParam+'</pre><br>';
-					if(err)
-						result = result+'ERROR:<br>'+err+'</br>';
-					if(data)
-						result = result+JSON.stringify(data)+'</br>';
-					result = result + '<br><pre>'+JSON.stringify(process.env)+'</pre></br>';
+					if(err) {
+						result = result+'ERROR:<br>'+err+'</br>';	
+						console.log('ERROR: '+err);
+					}
+					if(data) {
+						result = result+JSON.stringify(data)+'</br>';	
+						//console.log('data returned!'+JSON.stringify(data));
+						console.log('data returned');
+					}
+					//result = result + '<br><pre>'+JSON.stringify(process.env)+'</pre></br>';
 					
 					return response.send(result);
 				});
