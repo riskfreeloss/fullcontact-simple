@@ -40,9 +40,16 @@ inno.getSettings({
 
 app.use(express.static(__dirname + '/public'))
 
-app.get('/', function(request, response) {
+app.get('/', handleRequests);
+app.post('/', handleRequests);
 
-	console.log("Received http request: "+JSON.stringify(request.params)+" "+JSON.stringify(request.query)+" "+JSON.stringify(request.body));
+app.listen(app.get('port'), function() {
+  console.log("Node app is running at localhost:" + app.get('port'))
+})
+
+function handleRequests(request, response) {
+
+	console.log("Received http request: "+JSON.stringify(request.method)+" "+JSON.stringify(request.params)+" "+JSON.stringify(request.query)+" "+JSON.stringify(request.body));
 
 	inno.getSettings({
 		vars: inno.getVars()
@@ -54,8 +61,8 @@ app.get('/', function(request, response) {
 			});
 		}
 
-		//var emailParam = request.param("email") || settings.email;
-		var emailParam = settings.email;
+		var emailParam = request.param("email") || settings.email;
+		//var emailParam = settings.email;
 
 		fullcontact.person.email(emailParam, function (err, data) {
 
@@ -72,13 +79,8 @@ app.get('/', function(request, response) {
 						result = result+JSON.stringify(data)+'</br>';
 					result = result + '<br><pre>'+JSON.stringify(process.env)+'</pre></br>';
 					
-					console.log(result);
 					return response.send(result);
 				});
 			});
 	});
-});
-
-app.listen(app.get('port'), function() {
-  console.log("Node app is running at localhost:" + app.get('port'))
-})
+}
