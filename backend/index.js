@@ -8,7 +8,7 @@ app.set('port', (process.env.PORT || 5000));
 
 inno.setVars({
     bucketName: process.env.INNO_BUCKET || 'first-bucket',
-    appKey: process.env.INNO_APP_KEY || 'Nm4OvMQ6BEY9dlpu',
+    appKey: process.env.INNO_APP_KEY || 'P2Oc3kwPBe9t52Jd',
     appName: process.env.INNO_APP_NAME || 'full-contact-simple',
     groupId: process.env.INNO_COMPANY_ID || 9,
     apiUrl: process.env.INNO_API_URL || 'http://prerelease.innomdc.com/v1',
