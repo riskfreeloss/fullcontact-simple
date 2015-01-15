@@ -104,7 +104,7 @@ function handleRequests(request, response) {
 			inno.updateProfile({
 				vars: innoVars,
 				data: {
-						'socialMediaData': JSON.stringify(data.socialProfiles)
+						'socialMediaData': data.socialProfiles ? JSON.stringify(data.socialProfiles) : ""
 					}
 				}, function (err) {
 					var result = 'Attempted to retrieve data for <pre>'+emailParam+'</pre><br>';
