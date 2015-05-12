@@ -3,7 +3,7 @@
     "version_description": "",
     "pages": [{
         "name": "Setting App",
-        "type": "internal",
+        "type": "bundled",
         "content": "frontend/settings.html"
     }],
     "permissions": ["stream", "profile.update", "app.read.own", "profile.merge"],

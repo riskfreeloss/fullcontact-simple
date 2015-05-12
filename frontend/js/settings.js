@@ -7,7 +7,7 @@ var editor = new JSONEditor(formEl, {
     no_additional_properties: true,
     schema: {
         type: 'object',
-        title: 'Alchemy app settings',
+        title: 'FullContact-simple app settings',
         properties: {
             fcApiKey: {
                 title: 'FullContact API key',
@@ -16,15 +16,9 @@ var editor = new JSONEditor(formEl, {
                 maxLength: 16
             },
             email: {
-                title: 'Email',
+                title: 'Default Email',
                 type: 'string',
                 minLength: 5
-            },
-            IMAppKey: {
-                title: 'Innometrics App Key',
-                type: 'string',
-                minLength: 16,
-                maxLength: 16
             }
         }
     },
