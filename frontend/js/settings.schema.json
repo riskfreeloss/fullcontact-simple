@@ -1,0 +1,13 @@
+{
+    "fcApiKey": {
+        "title": "FullContact API key",
+        "type": "string",
+        "minLength": 16,
+        "maxLength": 16
+    },
+    "email": {
+        "title": "Default Email",
+        "type": "string",
+        "minLength": 5
+    }
+}
