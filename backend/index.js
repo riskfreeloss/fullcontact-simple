@@ -8,11 +8,11 @@ var express = require('express'),
 app.set('port', (process.env.PORT || 5000));
 
 inno.setVars({
-    bucketName: process.env.INNO_BUCKET /* || 'first-bucket' */,
+    bucketName: process.env.INNO_BUCKET_ID /* || 'first-bucket' */,
     appKey: process.env.INNO_APP_KEY /* || 'ZYSBCxyg5MP4P293'*/,
-    appName: process.env.INNO_APP_NAME /* || 'full-contact-simple'*/,
+    appName: process.env.INNO_APP_ID /* || 'full-contact-simple'*/,
     groupId: process.env.INNO_COMPANY_ID /* || 9 */,
-    apiUrl: process.env.INNO_API_URL /* || 'http://prerelease.innomdc.com/v1' */,
+    apiUrl: process.env.INNO_API_HOST /* || 'http://prerelease.innomdc.com/v1' */,
     auth: {
         user: '4.superuser',
         pass: 'test'
