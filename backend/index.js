@@ -43,6 +43,107 @@ function jsonError(res, error) {
     });
 }
 
+var socialEntries = {
+    "aboutme": "About.me",
+    "academiaedu": "Academia.edu",
+    "amplify": "Amplify",
+    "angellist": "AngelList",
+    "aolchat": "Aol Chat",
+    "bandcamp": "Bandcamp",
+    "bebo": "Bebo",
+    "behance": "Behance",
+    "bitbucket": "BitBucket",
+    "blipfm": "BlipFM",
+    "blippy": "Blippy",
+    "blogger": "Blogger",
+    "crunchbase": "Crunchbase",
+    "dandyid": "DandyId",
+    "delicious": "Delicious",
+    "deviantart": "Deviant Art",
+    "digg": "Digg",
+    "diigo": "Diigo",
+    "disqus": "Disqus",
+    "doyoubuzz": "Do You Buzz",
+    "dribble": "Dribbble",
+    "econsultancy": "eConsultancy",
+    "facebookchat": "Facebook Chat",
+    "facebook": "Facebook",
+    "flavorsme": "Flavors.me",
+    "flickr": "Flickr",
+    "foursquare": "FourSquare",
+    "friendfeed": "FriendFeed",
+    "friendster": "Friendster",
+    "fullcontact": "FullContact",
+    "gdgt": "gdgt",
+    "getglue": "Get Glue",
+    "getsatisfaction": "Get Satisfaction",
+    "gist": "Gist",
+    "github": "GitHub",
+    "goodreads": "Good Reads",
+    "googleplus": "Google Plus",
+    "googleprofile": "Google Profile",
+    "gravatar": "Gravatar",
+    "gtalkchat": "GTalk",
+    "hackernews": "Hacker News",
+    "hi5": "Hi5",
+    "hunch": "Hunch",
+    "hypemachine": "HypeMachine",
+    "hyves": "Hyves",
+    "icqchat": "ICQ",
+    "identica": "Identi.ca",
+    "imdb": "IMDB",
+    "intensedebate": "Intense Debate",
+    "ircchat": "IRC",
+    "klout": "Klout",
+    "lanyrd": "Lanyrd",
+    "lastfm": "Last.FM",
+    "linkedin": "LinkedIn",
+    "livejournal": "LiveJournal",
+    "meadiciona": "Meadiciona",
+    "meetup": "Meetup",
+    "mixcloud": "Mixcloud",
+    "mixi": "Mixi",
+    "myspace": "MySpace",
+    "ohloh": "Ohloh",
+    "orkut": "Orkut",
+    "other": "Other",
+    "pandora": "Pandora",
+    "picasa": "Picasa",
+    "pinboard": "Pin Board",
+    "pinterest": "Pinterest",
+    "plancast": "Plancast",
+    "plaxo": "Plaxo",
+    "plurk": "Plurk",
+    "qik": "Qik",
+    "quora": "Quora",
+    "reddit": "Reddit",
+    "renren": "Ren Ren",
+    "reverbnation": "Reverb Nation",
+    "scribd": "Scribd",
+    "shelfari": "Shelfari",
+    "skype": "Skype",
+    "slideshare": "SlideShare",
+    "smugmug": "Smug Mug",
+    "soundcloud": "Sound Cloud",
+    "stackexchange": "StackExchange",
+    "stackoverflow": "StackOverflow",
+    "steam": "Steam",
+    "stumbleupon": "Stumble Upon",
+    "tagged": "Tagged",
+    "tripit": "Tripit",
+    "tumblr": "Tumblr",
+    "twitter": "Twitter",
+    "typepad": "Type Pad",
+    "vimeo": "Vimeo",
+    "vk": "VK",
+    "wordpress": "WordPress.org",
+    "xing": "Xing",
+    "yahoochat": "Yahoo! Chat",
+    "yahoo": "Yahoo!",
+    "yelp": "Yelp",
+    "youtube": "YouTube"
+};
+
 // POST request to "/" is always expected to recieve stream with events
 app.post('/', function (req, res) {
     var indexTask = tasks.push('---');
@@ -56,6 +157,7 @@ app.post('/', function (req, res) {
                 return jsonError(res, error);
             }
             var emailParam = parsedData.data && parsedData.data.email || settings.email;
+            var entityType = settings.entityType || [];
             var profileId = parsedData.profile.id;
             var section = parsedData.session.section;
             var collectApp = parsedData.session.collectApp;
@@ -66,13 +168,24 @@ app.post('/', function (req, res) {
                     return jsonError(res, error);
                 }
 
+                var socialProfiles = data && data.socialProfiles;
+                var attributes = {};
+                for (var i = 0; i < socialProfiles.length; i++) {
+                    var socialProfile = socialProfiles[i];
+                    if (entityType.length &&
+                        socialEntries.hasOwnProperty(socialProfile.typeId) &&
+                        entityType.indexOf(socialEntries[socialProfile.typeId]) > -1) {
+                        var key = 'SocialMedia_' + socialProfile.typeId;
+                        delete socialProfile.type;
+                        delete socialProfile.typeId;
+                        attributes[key] = socialProfile;
+                    }
+                }
                 inno.setProfileAttributes({
                     collectApp: collectApp,
                     section: section,
                     profileId: profileId,
-                    attributes: {
-                        socialMediaData: data && data.socialProfiles && JSON.stringify(data.socialProfiles)
-                    }
+                    attributes: attributes
                 }, function (error) {
                     if (error) {
                         return jsonError(res, error);
