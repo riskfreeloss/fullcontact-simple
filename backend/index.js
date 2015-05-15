@@ -170,28 +170,49 @@ app.post('/', function (req, res) {
 
                 var socialProfiles = data && data.socialProfiles;
                 var attributes = {};
-                for (var i = 0; i < socialProfiles.length; i++) {
-                    var socialProfile = socialProfiles[i];
-                    if (entityType.length &&
-                        socialEntries.hasOwnProperty(socialProfile.typeId) &&
-                        entityType.indexOf(socialEntries[socialProfile.typeId]) > -1) {
-                        var key = 'SocialMedia_' + socialProfile.typeId;
-                        delete socialProfile.type;
-                        delete socialProfile.typeId;
-                        attributes[key] = socialProfile;
-                    }
-                }
-                inno.setProfileAttributes({
-                    collectApp: collectApp,
+
+                inno.getProfileAttributes({
+                    collectApp: inno.config.appName,
                     section: section,
-                    profileId: profileId,
-                    attributes: attributes
-                }, function (error) {
-                    if (error) {
-                        return jsonError(res, error);
+                    profileId: profileId
+                }, function (error, attrs) {
+                    var key;
+                    if (attrs && attrs.length && attrs[0].data) {
+                        attrs = attrs[0].data;
+                        for (var i in attrs) {
+                            if (attrs.hasOwnProperty(i)) {
+                                var patterns = i.match(/^SocialMedia_(\w+)$/);
+                                if (patterns && patterns.length === 2 && socialEntries.hasOwnProperty(patterns[1]) && entityType.indexOf(patterns[1]) === -1) {
+                                    key = 'SocialMedia_' + patterns[1];
+                                    attributes[key] = {};
+                                }
+                            }
+                        }
                     }
-                    res.json({
-                        error: null
+
+                    for (var j = 0; j < socialProfiles.length; j++) {
+                        var socialProfile = socialProfiles[j];
+                        if (entityType.length &&
+                            socialEntries.hasOwnProperty(socialProfile.typeId) &&
+                            entityType.indexOf(socialEntries[socialProfile.typeId]) > -1) {
+                            key = 'SocialMedia_' + socialProfile.typeId;
+                            delete socialProfile.type;
+                            delete socialProfile.typeId;
+                            attributes[key] = socialProfile;
+                        }
+                    }
+                    inno.setProfileAttributes({
+                        collectApp: collectApp,
+                        section: section,
+                        profileId: profileId,
+                        attributes: attributes
+                    }, function (error) {
+                        if (error) {
+                            return jsonError(res, error);
+                        }
+                        res.json({
+                            error: null
+                        });
                     });
                 });
             });
