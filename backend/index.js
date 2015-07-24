@@ -25,11 +25,11 @@ app.use(function (req, res, next) {
  * In case of manual install of backend part, you need to setup these manually.
  */
 var config = {
-    groupId: 230, //process.env.INNO_COMPANY_ID,
-    bucketName: 'bc0', //process.env.INNO_BUCKET_ID,
-    appName: 'anton-group-aaa', //process.env.INNO_APP_ID,
-    appKey: 'X80iJqz0yRz3KkC0', //process.env.INNO_APP_KEY,
-    apiUrl: 'https://staging.innomdc.com' //process.env.INNO_API_HOST
+    groupId: process.env.INNO_COMPANY_ID,
+    bucketName: process.env.INNO_BUCKET_ID,
+    appName: process.env.INNO_APP_ID,
+    appKey: process.env.INNO_APP_KEY,
+    apiUrl: process.env.INNO_API_HOST
 };
 var innoHelper = new inno.InnoHelper(config);
 
@@ -180,7 +180,7 @@ app.post('/', function (req, res) {
         }
 
         tasks[indexTask - 1] = email;
-        
+
         fullcontact = fullcontact || new FullContact(settings.fcApiKey);
         fullcontact.person.email(email, function (error, data) {
             if (error) {
