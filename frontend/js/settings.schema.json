@@ -5,6 +5,10 @@
         "minLength": 16,
         "maxLength": 16
     },
+    "eventData": {
+        "title": "Event data with email",
+        "type": "string"
+    },
     "email": {
         "title": "Default Email",
         "type": "string",
@@ -18,5 +22,10 @@
             "type": "string",
             "enum": ["About.me", "Academia.edu", "Amplify", "AngelList", "Aol Chat", "Bandcamp", "Bebo", "Behance", "BitBucket", "BlipFM", "Blippy", "Blogger", "Crunchbase", "DandyId", "Delicious", "Deviant Art", "Digg", "Diigo", "Disqus", "Do You Buzz", "Dribbble", "eConsultancy", "Facebook Chat", "Facebook", "Flavors.me", "Flickr", "FourSquare", "FriendFeed", "Friendster", "FullContact", "gdgt", "Get Glue", "Get Satisfaction", "Gist", "GitHub", "Good Reads", "Google Plus", "Google Profile", "Gravatar", "GTalk", "Hacker News", "Hi5", "Hunch", "HypeMachine", "Hyves", "ICQ", "Identi.ca", "IMDB", "Intense Debate", "IRC", "Klout", "Lanyrd", "Last.FM", "LinkedIn", "LiveJournal", "Meadiciona", "Meetup", "Mixcloud", "Mixi", "MySpace", "Ohloh", "Orkut", "Other", "Pandora", "Picasa", "Pin Board", "Pinterest", "Plancast", "Plaxo", "Plurk", "Qik", "Quora", "Reddit", "Ren Ren", "Reverb Nation", "Scribd", "Shelfari", "Skype", "SlideShare", "Smug Mug", "Sound Cloud", "StackExchange", "StackOverflow", "Steam", "Stumble Upon", "Tagged", "Tripit", "Tumblr", "Twitter", "Type Pad", "Vimeo", "VK", "WordPress.com", "WordPress.org", "Xing", "Yahoo! Chat", "Yahoo!", "Yelp", "YouTube"]
         }
+    },
+    "section": {
+        "title": "Section ID",
+        "type": "string",
+        "minLength": 2
     }
 }

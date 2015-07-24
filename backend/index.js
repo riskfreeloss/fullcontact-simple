@@ -1,6 +1,6 @@
 var express = require('express'), // Allows easily build a web server
     bodyParser = require('body-parser'),
-    InnoHelper = require('innometrics-helper'); // Innometrics helper to work with profile cloud
+    inno = require('innometrics-helper'); // Innometrics helper to work with profile cloud
 
 var FullContact = require('fullcontact'),
     fullcontact = null;
@@ -25,13 +25,13 @@ app.use(function (req, res, next) {
  * In case of manual install of backend part, you need to setup these manually.
  */
 var config = {
-    groupId: process.env.INNO_COMPANY_ID,
-    bucketName: process.env.INNO_BUCKET_ID,
-    appName: process.env.INNO_APP_ID,
-    appKey: process.env.INNO_APP_KEY,
-    apiUrl: process.env.INNO_API_HOST
+    groupId: 230, //process.env.INNO_COMPANY_ID,
+    bucketName: 'bc0', //process.env.INNO_BUCKET_ID,
+    appName: 'anton-group-aaa', //process.env.INNO_APP_ID,
+    appKey: 'X80iJqz0yRz3KkC0', //process.env.INNO_APP_KEY,
+    apiUrl: 'https://staging.innomdc.com' //process.env.INNO_API_HOST
 };
-var inno = new InnoHelper(config);
+var innoHelper = new inno.InnoHelper(config);
 
 var errors = [];
 var tasks = [];
@@ -147,72 +147,104 @@ var socialEntries = {
 // POST request to "/" is always expected to recieve stream with events
 app.post('/', function (req, res) {
     var indexTask = tasks.push('---');
-    inno.getAppSettings(function (error, settings) {
+    innoHelper.getAppSettings(function (error, settings) {
         if (error) {
             return jsonError(res, error);
         }
+
+        var profile = innoHelper.getProfileFromRequest(req.body);
+        var profileId = profile.getId();
+        var lastSession = profile.getLastSession();
+        var entityType = settings.entityType || [];
+        var section = settings.section;
+        var collectApp = innoHelper.getCollectApp();
+        var eventData = settings.eventData || 'email';
+        var email;
+
+        if (!section) {
+            return jsonError(res, new Error('You have no section of the app in settings'));
+        }
+
+        if (!entityType.length) {
+            return jsonError(res, new Error('You need to choose at least one "Entity type" in settings'));
+        }
+
+        try {
+            email = lastSession.getEvents()[0].getDataValue(eventData);
+        } catch (e) {
+            email = settings.email;
+        }
+
+        if (!email) {
+            return jsonError(res, new Event('Email is empty'));
+        }
+
+        tasks[indexTask - 1] = email;
+        
         fullcontact = fullcontact || new FullContact(settings.fcApiKey);
-        inno.getProfile(req.body, function (error, parsedData) {
+        fullcontact.person.email(email, function (error, data) {
             if (error) {
                 return jsonError(res, error);
             }
-            var emailParam = parsedData.data && parsedData.data.email || settings.email;
-            var entityType = settings.entityType || [];
-            var profileId = parsedData.profile.id;
-            var section = parsedData.session.section;
-            var collectApp = parsedData.session.collectApp;
-            tasks[indexTask - 1] = emailParam;
 
-            fullcontact.person.email(emailParam, function (error, data) {
+            var socialProfiles = data && data.socialProfiles;
+            if (!socialProfiles.length) {
+                return;
+            }
+
+            innoHelper.loadProfile(profileId, function (error, fullProfile) {
                 if (error) {
                     return jsonError(res, error);
                 }
 
-                var socialProfiles = data && data.socialProfiles;
-                var attributes = {};
+                var attrs = fullProfile.getAttributes(collectApp, section);
+                var attrsMap = {};
+                var attributes = [];
 
-                inno.getProfileAttributes({
-                    collectApp: inno.config.appName,
-                    section: section,
-                    profileId: profileId
-                }, function (error, attrs) {
+                attrs.forEach(function (attr) {
+                    var name = attr.getName();
+                    var m = name.match(/^SocialMedia_(\w+)$/);
+                    if (m && m.length === 2 && socialEntries.hasOwnProperty(m[1]) && entityType.indexOf(m[1]) === -1) {
+                        attrsMap[name] = {};
+                    }
+                });
+
+                socialProfiles.forEach(function (socialProfile) {
+                    var spTypeId = socialProfile.typeId;
                     var key;
-                    if (attrs && attrs.length && attrs[0].data) {
-                        attrs = attrs[0].data;
-                        for (var i in attrs) {
-                            if (attrs.hasOwnProperty(i)) {
-                                var patterns = i.match(/^SocialMedia_(\w+)$/);
-                                if (patterns && patterns.length === 2 && socialEntries.hasOwnProperty(patterns[1]) && entityType.indexOf(patterns[1]) === -1) {
-                                    key = 'SocialMedia_' + patterns[1];
-                                    attributes[key] = {};
-                                }
-                            }
-                        }
-                    }
 
-                    for (var j = 0; j < socialProfiles.length; j++) {
-                        var socialProfile = socialProfiles[j];
-                        if (entityType.length &&
-                            socialEntries.hasOwnProperty(socialProfile.typeId) &&
-                            entityType.indexOf(socialEntries[socialProfile.typeId]) > -1) {
-                            key = 'SocialMedia_' + socialProfile.typeId;
-                            delete socialProfile.type;
-                            delete socialProfile.typeId;
-                            attributes[key] = socialProfile;
-                        }
+                    if (socialEntries.hasOwnProperty(spTypeId) &&
+                        entityType.indexOf(socialEntries[spTypeId]) > -1) {
+
+                        key = 'SocialMedia_' + spTypeId;
+                        delete socialProfile.type;
+                        delete socialProfile.typeId;
+
+                        attrsMap[key] = {
+                            collectApp: collectApp,
+                            section: section,
+                            name: key,
+                            value: socialProfile
+                        };
+
                     }
-                    inno.setProfileAttributes({
-                        collectApp: collectApp,
-                        section: section,
-                        profileId: profileId,
-                        attributes: attributes
-                    }, function (error) {
-                        if (error) {
-                            return jsonError(res, error);
-                        }
-                        res.json({
-                            error: null
-                        });
+                });
+
+                var key;
+                for (key in attrsMap) {
+                    if (attrsMap.hasOwnProperty(key)) {
+                        attributes.push(attrsMap[key]);
+                    }
+                }
+
+                fullProfile.setAttributes(attributes);
+
+                innoHelper.saveProfile(fullProfile, function (error) {
+                    if (error) {
+                        return jsonError(res, error);
+                    }
+                    res.json({
+                        error: null
                     });
                 });
             });
@@ -225,7 +257,7 @@ app.get('/', function (req, res) {
     errors = errors.slice(-10);
     tasks = tasks.slice(-10);
     res.json({
-        error: errors,
+        error: errors.map(function (e) { return e.message; }),
         tasks: tasks
     });
 });
