@@ -10,7 +10,7 @@
     "express": "^4.0.0",
     "fullcontact": "^0.1.0",
     "body-parser": "^1.10.1",
-    "innometrics-helper": "0.0.4"
+    "innometrics-helper": "0.0.7"
   },
   "engines": {
     "node": "0.10.x"

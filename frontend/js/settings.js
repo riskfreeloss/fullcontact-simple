@@ -31,7 +31,7 @@
                 title: 'App settings stored in Innometrics Cloud',
                 properties: propertiesSchema
             },
-            required: ['apiKey', 'email'],
+            required: ['apiKey', 'email', 'section'],
             required_by_default: true,
             theme: 'bootstrap3'
         });
