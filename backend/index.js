@@ -176,7 +176,7 @@ app.post('/', function (req, res) {
         }
 
         if (!email) {
-            return jsonError(res, new Event('Email is empty'));
+            return jsonError(res, new Error('Email is empty'));
         }
 
         tasks[indexTask - 1] = email;
